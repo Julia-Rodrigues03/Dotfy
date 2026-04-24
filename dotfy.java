@@ -111,35 +111,37 @@ public class dotfy {
         
         for (int i = 0; i < bancoDeMusicas.size(); i++) {
             Musica m = bancoDeMusicas.get(i);
-            System.out.printf("%d. Título: %s | Artista: %s | Duração: %s | Gênero: %s%n",
-                (i + 1), m.getTitulo(), m.getArtista(), formatarDuracao(m.getDuracao()), m.getGenero()
-            );
+            System.out.print((i + 1) + ". ");
+            m.exibirDetalhes(); // O Java decide sozinho se formata como Música ou como Podcast!
         }
     }
     
     public static void buscarPorTitulo() {
-    System.out.println("\n--- BUSCAR POR TÍTULO ---");
+        System.out.println("\n--- BUSCAR POR TÍTULO ---");
         System.out.print("Digite o título (ou parte dele): ");
         String busca = scanner.nextLine().trim().toLowerCase();
-        
+    
         boolean encontrou = false;
         for (int i = 0; i < bancoDeMusicas.size(); i++) {
-            Musica m = bancoDeMusicas.get(i);
-            if (m.getTitulo().toLowerCase().contains(busca)) {
-                if (!encontrou) {
-                    System.out.println("\nMúsicas encontradas: ");
-                    encontrou = true;
-                }
-                System.out.printf("- %s | %s | %s | %s%n",
-                    m.getTitulo(), m.getArtista(), formatarDuracao(m.getDuracao()), m.getGenero()
-                );
-            }
-        }
+        // 1. Mudamos para 'Audio' para aceitar qualquer coisa da nossa hierarquia
+        audio m = bancoDeMusicas.get(i);
         
-        if (!encontrou) {
-            System.out.println("❌ Nenhuma música encontrada com esse título.");
+        if (m.getTitulo().toLowerCase().contains(busca)) {
+            if (!encontrou) {
+                System.out.println("\nItens encontrados: ");
+                encontrou = true;
+            }
+            // 2. A MÁGICA DO POLIMORFISMO:
+            // O Java descobre sozinho se deve usar o exibirDetalhes da Música ou do Podcast
+            System.out.print("- ");
+            m.exibirDetalhes();
         }
     }
+    
+    if (!encontrou) {
+        System.out.println("❌ Nada encontrado com esse título.");
+    }
+}
 
     public static void criarplaylist() {
         System.out.println("\n--- CRIAR / ADICIONAR À PLAYLIST ---");

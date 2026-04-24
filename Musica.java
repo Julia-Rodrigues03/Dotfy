@@ -1,43 +1,37 @@
-public class Musica {
-    // Atributos privados
-    private String titulo;
+
+// Conceito de herança e Palavra-chave extends
+public class Musica extends audio {
     private String artista;
-    private int duracao;
     private String genero;
 
-    // Construtor (Chamado na hora de criar a música pela primeira vez)
+    // Construtor completo
     public Musica(String titulo, String artista, int duracao, String genero) {
-        this.titulo = titulo;
+        // ✅ Palavra-chave super: Chama o construtor da classe pai (Audio)
+        super(titulo, duracao);
         this.artista = artista;
-        this.duracao = duracao;
         this.genero = genero;
     }
 
-    
-    // GETTERS Para LER os dados
-
-    public String getTitulo() { return this.titulo; }
-    public String getArtista() { return this.artista; }
-    public int getDuracao() { return this.duracao; }
-    public String getGenero() { return this.genero; }
-
-    
-    // SETTERS para ALTERAR os dados
-
-    public void setTitulo(String novoTitulo) {
-        //  substitui o que esta escrito pelo novo valor
-        this.titulo = novoTitulo;
+    // ✅ Sobrecarga de métodos (Overloading):
+    // Temos dois construtores com parâmetros diferentes.
+    // Se não passarem o gênero, ele vira "Desconhecido" por padrão.
+    public Musica(String titulo, String artista, int duracao) {
+        super(titulo, duracao);
+        this.artista = artista;
+        this.genero = "Desconhecido";
     }
 
-    public void setArtista(String novoArtista) {
-        this.artista = novoArtista;
-    }
+    public String getArtista() { return artista; }
+    public void setArtista(String artista) { this.artista = artista; }
+    public String getGenero() { return genero; }
+    public void setGenero(String genero) { this.genero = genero; }
 
-    public void setDuracao(int novaDuracao) {
-        this.duracao = novaDuracao;
-    }
-
-    public void setGenero(String novoGenero) {
-        this.genero = novoGenero;
+    // ✅ Sobrescrita de métodos (Overriding):
+    // Modificamos o comportamento do método da classe pai.
+    @Override
+    public void exibirDetalhes() {
+        System.out.print("[MÚSICA] ");
+        super.exibirDetalhes(); // Reutiliza a impressão do título e duração da classe pai
+        System.out.println("| Artista: " + artista + " | Gênero: " + genero);
     }
 }
