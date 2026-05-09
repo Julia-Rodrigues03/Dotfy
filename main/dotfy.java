@@ -1,17 +1,20 @@
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import usuario.usuario;
+import usuario.usuarioFree;
+
 public class dotfy {
     
     // Agora usamos apenas a lista de Objetos 'Musica'
     private static ArrayList<Musica> bancoDeMusicas = new ArrayList<>();
     
     // Listas para a playlist
-    private static ArrayList<String> playlist = new ArrayList<>();
-    private static ArrayList<String> musicasPlaylist = new ArrayList<>(); // Adicionei de volta para a playlist funcionar
-
+    private static ArrayList<playlist> bancoDePlaylists = new ArrayList<>();
     private static final String[] GENEROS_VALIDOS = {"Pop", "Rock", "Jazz", "Eletrônica", "Hip-Hop", "Clássica", "K-Pop", "Forró", "MPB", "R&B", "Funk"};
     private static Scanner scanner = new Scanner(System.in);
+// Definimos um usuário padrão (Free) ao iniciar o sistema
+    private static usuario usuarioLogado = new usuarioFree ("Julia", "julia@email.com");
     
     public static void main(String[] args) {
         adicionarMusicasTeste();
@@ -23,7 +26,7 @@ public class dotfy {
             processarOpcao(opcao);
         } while (opcao != 0);
         
-        System.out.println("\n🎵 Obrigado por usar o Sistema Dotfy! Até logo! 🎵");
+        System.out.println("\n Obrigado por usar o Sistema Dotfy! Até logo! ");
         scanner.close();
     }
 
@@ -63,7 +66,7 @@ public class dotfy {
             case 7: removerMusica(); break;
             case 8: menuEditarMusica(); break;
             case 0: break;
-            default: System.out.println("❌ Opção inválida! Tente novamente.");
+            default: System.out.println(" Opção inválida! Tente novamente.");
         }
     }
 
@@ -81,7 +84,7 @@ public class dotfy {
         try {
             duracaoDigitada = Integer.parseInt(scanner.nextLine());
         } catch (Exception e) {
-            System.out.println("❌ Duração inválida!");
+            System.out.println(" Duração inválida!");
             return;
     }
         
@@ -98,7 +101,7 @@ public class dotfy {
         Musica novaMusica = new Musica(tituloDigitado, artistaDigitado, duracaoDigitada, generoEscolhido);
         bancoDeMusicas.add(novaMusica);
         
-        System.out.println("✅ Música cadastrada com sucesso!");
+        System.out.println(" Música cadastrada com sucesso!");
     }
 
     public static void listarMusicas() {
@@ -139,53 +142,69 @@ public class dotfy {
     }
     
     if (!encontrou) {
-        System.out.println("❌ Nada encontrado com esse título.");
+        System.out.println(" Nada encontrado com esse título.");
     }
 }
 
     public static void criarplaylist() {
-        System.out.println("\n--- CRIAR / ADICIONAR À PLAYLIST ---");
-        System.out.print("Digite o nome da Playlist: ");
-        String nomePlaylist = scanner.nextLine().trim();
 
-        System.out.print("Título da Música: ");
-        String titulo = scanner.nextLine().trim();
+    System.out.println("\n--- GERENCIAR PLAYLISTS ---");
+    System.out.print("Nome da Playlist: ");
+    String nomeBusca = scanner.nextLine().trim();
 
-        System.out.print("Artista: ");
-        String artista = scanner.nextLine().trim();
-
-        String novaMusica = titulo + " (por " + artista + ")";
-        boolean encontrou = false;
-
-    for(int i = 0; i < playlist.size(); i++){
-            if (playlist.get(i).equalsIgnoreCase(nomePlaylist)) {
-                String musicasAntigas = musicasPlaylist.get(i);
-                musicasPlaylist.set(i, musicasAntigas + ", " + novaMusica);
-                encontrou = true;
-                System.out.println("✅ Música adicionada à playlist '" + nomePlaylist + "' já existente!");
-                break;
-            }
-        }
-
-        if (!encontrou){
-            playlist.add(nomePlaylist);
-            musicasPlaylist.add(novaMusica);
-            System.out.println("✅ Playlist '" + nomePlaylist + "' criada com sucesso!");
+    // 1. Busca se a playlist já existe no banco de objetos
+    playlist playlistEncontrada = null;
+    for (playlist p : bancoDePlaylists) {
+        if (p.getNome().equalsIgnoreCase(nomeBusca)) {
+            playlistEncontrada = p;
+            break;
         }
     }
+
+    // 2. Se não existe, cria uma nova e adiciona ao banco
+    if (playlistEncontrada == null) {
+        playlistEncontrada = new playlist(nomeBusca);
+        bancoDePlaylists.add(playlistEncontrada);
+        System.out.println(" Nova playlist '" + nomeBusca + "' criada!");
+    }
+
+    // 3. Validação de Limite usando o usuário logado
+    if (playlistEncontrada.quantidadeItens() >= usuarioLogado.getLimitePlaylist()) {
+        System.out.println(" Limite de " + usuarioLogado.getLimitePlaylist() + " itens atingido para sua conta!");
+        return;
+    }
+
+    // 4. Lógica para buscar a música e adicionar (similar ao que você já faz)
+    System.out.print("Título da música para adicionar: ");
+    String titulo = scanner.nextLine().trim();
+    
+}
+
 
     public static void gerenciarplaylist() {
-        System.out.println("\n--- GERENCIAR PLAYLIST ---");
-        if (playlist.isEmpty()){
-            System.out.println("Nenhuma playlist criada ainda.");
-            return;
-        }
 
-        System.out.println("PLAYLISTS DISPONÍVEIS:");
-        for (int i = 0; i < playlist.size(); i++){
-            System.out.println((i + 1) + ". Nome: " + playlist.get(i) + " | Contém: " + musicasPlaylist.get(i));
+    System.out.println("\n--- GERENCIAR PLAYLISTS ---");
+    
+    if (bancoDePlaylists.isEmpty()) {
+        System.out.println("Nenhuma playlist criada ainda.");
+        return;
     }
+
+    // Listar todas as playlists disponíveis
+    for (int i = 0; i < bancoDePlaylists.size(); i++) {
+        playlist p = bancoDePlaylists.get(i);
+        System.out.println((i + 1) + ". " + p.getNome() + " (" + p.quantidadeItens() + " itens)");
     }
+
+    System.out.print("\nDigite o número da playlist para ver os detalhes (ou 0 para voltar): ");
+    int escolha = lerOpcao();
+
+    if (escolha > 0 && escolha <= bancoDePlaylists.size()) {
+        // Aqui está a mágica: o Main pede para o OBJETO playlist se mostrar
+        bancoDePlaylists.get(escolha - 1).exibirPlaylistCompleta();
+    }
+}
+    
 
     public static void exibirEstatisticas() {
         System.out.println("\n--- ESTATÍSTICAS DO SISTEMA ---");
@@ -263,7 +282,7 @@ public class dotfy {
             }
         }
         
-        // O if (!encontrou) agora está no lugar certinho, FORA do for!
+        // O if (!encontrou)
         if (!encontrou){
             System.out.println("❌ Nenhuma música encontrada com esse nome.");
         }
@@ -362,43 +381,38 @@ public static void editarTitulo() {
 
 
     public static void editarDuracao() {
-        System.out.println("\n--- EDITAR DURAÇÃO ---");
-        System.out.print("Digite o título (ou parte dele): ");
-        String busca = scanner.nextLine().trim().toLowerCase();
+    System.out.println("\n--- EDITAR DURAÇÃO ---");
+    System.out.print("Digite o título (ou parte dele): ");
+    String busca = scanner.nextLine().trim().toLowerCase();
 
-        boolean encontrou = false;
-        
-        for (int i = 0; i < bancoDeMusicas.size(); i++) {
-            Musica m = bancoDeMusicas.get(i);
+    boolean encontrou = false;
+    
+    for (Musica m : bancoDeMusicas) {
+        if (m.getTitulo().toLowerCase().contains(busca)) {
+            encontrou = true;
+            System.out.println("Música encontrada: " + m.getTitulo());
+            System.out.println("Duração atual: " + formatarDuracao(m.getDuracao()));
             
-            if (m.getTitulo().toLowerCase().contains(busca)) {
-                
-                System.out.println("musica encontrada: " + m.getTitulo());
-
-                System.out.println("Duração atual: " + formatarDuracao(m.getDuracao()));
-                
-                System.out.println("Digite a nova duração:");
-
-                try{
-                    int novaDuracao = Integer.parseInt(scanner.nextLine().trim());
-
-                    if (novaDuracao <= 0){
-                    System.out.println("a duração dever ser maior que zero");
-                    } else {
-                        m.setDuracao(novaDuracao);
-                        System.out.println("Duração atualizada com sucesso");
-                    }
-                } catch (Exception e ) {
-                    System.out.println("Erro: Voce deve digitar somente numeros");
-                }
-                encontrou = true;
-                break;
+            System.out.print("Digite a nova duração (em segundos): ");
+            try {
+                int novaDuracao = Integer.parseInt(scanner.nextLine().trim());
+                // A MÁGICA ACONTECE AQUI:
+                m.atualizarDuracao(novaDuracao);
+            } catch (NumberFormatException e) {
+                System.out.println("Erro: Você deve digitar somente números inteiros.");
             }
+            break;
+        }
+    }
+    
+    if (!encontrou) {
+        System.out.println(" Nenhuma música encontrada com esse nome.");
+    }
         }
         
         //  caso nao encontre a musica exuibir mensagem
         if (!encontrou){
-            System.out.println("❌ Nenhuma música encontrada com esse nome.");
+            System.out.println("Nenhuma música encontrada com esse nome.");
         }
     }
 

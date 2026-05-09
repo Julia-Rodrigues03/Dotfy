@@ -10,7 +10,7 @@ public class podcast extends audio {
     public String getApresentador() { return apresentador; }
     public void setApresentador(String apresentador) { this.apresentador = apresentador; }
 
-    // ✅ Sobrescrita de métodos (Overriding) específica para Podcast
+    // Sobrescrita de métodos (Overriding) específica para Podcast
     @Override
     public void exibirDetalhes() {
         System.out.print("[PODCAST] ");
