@@ -1,8 +1,10 @@
+package main;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 import usuario.usuario;
 import usuario.usuarioFree;
+import usuario.usuarioPremium;
 
 public class dotfy {
     
@@ -13,11 +15,38 @@ public class dotfy {
     private static ArrayList<playlist> bancoDePlaylists = new ArrayList<>();
     private static final String[] GENEROS_VALIDOS = {"Pop", "Rock", "Jazz", "Eletrônica", "Hip-Hop", "Clássica", "K-Pop", "Forró", "MPB", "R&B", "Funk"};
     private static Scanner scanner = new Scanner(System.in);
-// Definimos um usuário padrão (Free) ao iniciar o sistema
-    private static usuario usuarioLogado = new usuarioFree ("Julia", "julia@email.com");
+
+    private static usuario usuarioLogado; // Variável para armazenar o usuário logado
+
+//usuario faz login e tem um plano (free ou premium)
+    public static void realizarLogin() {
+        System.out.println("=".repeat(50));
+        System.out.println(" BEM-VINDO AO DOTFY ");
+        System.out.println("=".repeat(50));
+        System.out.print("Digite seu nome: ");
+        String nome = scanner.nextLine();
+        System.out.print("Digite seu email: ");
+        String email = scanner.nextLine();
+
+        System.out.println("\nEscolha seu plano:");
+        System.out.println("1. Free (Limite de 5 músicas na playlist)");
+        System.out.println("2. Premium (Músicas ilimitadas e alta qualidade)");
+        System.out.print("Opção: ");
+        int tipo = lerOpcao();
+
+        if (tipo == 2) {
+        usuarioLogado = new usuarioPremium(nome, email);
+        System.out.println(" Conta Premium ativada!");
+        } else {
+        usuarioLogado = new usuarioFree(nome, email);
+        System.out.println(" Conta Free ativada!");
+    }
+}
     
     public static void main(String[] args) {
+        System.setProperty("file.encoding", "UTF-8");
         adicionarMusicasTeste();
+        realizarLogin();
         
         int opcao;
         do {
@@ -42,6 +71,7 @@ public class dotfy {
         System.out.println("6. Exibir estatísticas");
         System.out.println("7. Remover Música");
         System.out.println("8. Editar Música");
+        System.out.println("9. Reproduzir Música ");
         System.out.println("0. Sair");
         System.out.println("=".repeat(50));
         System.out.print("Escolha uma opção: ");
@@ -65,6 +95,7 @@ public class dotfy {
             case 6: exibirEstatisticas(); break;
             case 7: removerMusica(); break;
             case 8: menuEditarMusica(); break;
+            case 9: reproduzirMusica(); break;
             case 0: break;
             default: System.out.println(" Opção inválida! Tente novamente.");
         }
@@ -115,7 +146,7 @@ public class dotfy {
         for (int i = 0; i < bancoDeMusicas.size(); i++) {
             Musica m = bancoDeMusicas.get(i);
             System.out.print((i + 1) + ". ");
-            m.exibirDetalhes(); // O Java decide sozinho se formata como Música ou como Podcast!
+            m.exibirDetalhes(); //  decide se formata como Música ou como Podcast!
         }
     }
     
@@ -126,7 +157,7 @@ public class dotfy {
     
         boolean encontrou = false;
         for (int i = 0; i < bancoDeMusicas.size(); i++) {
-        // 1. Mudamos para 'Audio' para aceitar qualquer coisa da nossa hierarquia
+        // 1. utilizamos o tipo mais genérico possível (audio) para percorrer a lista, mesmo que ela seja de Musica.
         audio m = bancoDeMusicas.get(i);
         
         if (m.getTitulo().toLowerCase().contains(busca)) {
@@ -134,8 +165,8 @@ public class dotfy {
                 System.out.println("\nItens encontrados: ");
                 encontrou = true;
             }
-            // 2. A MÁGICA DO POLIMORFISMO:
-            // O Java descobre sozinho se deve usar o exibirDetalhes da Música ou do Podcast
+            // 2. polimorfismo em ação: o Java descobre sozinho se deve usar o exibirDetalhes da Música ou do Podcast
+            
             System.out.print("- ");
             m.exibirDetalhes();
         }
@@ -152,7 +183,7 @@ public class dotfy {
     System.out.print("Nome da Playlist: ");
     String nomeBusca = scanner.nextLine().trim();
 
-    // 1. Busca se a playlist já existe no banco de objetos
+    // 1. Busca se a playlist já existe
     playlist playlistEncontrada = null;
     for (playlist p : bancoDePlaylists) {
         if (p.getNome().equalsIgnoreCase(nomeBusca)) {
@@ -174,7 +205,7 @@ public class dotfy {
         return;
     }
 
-    // 4. Lógica para buscar a música e adicionar (similar ao que você já faz)
+    // 4. Lógica para buscar a música e adicionarr na playlist
     System.out.print("Título da música para adicionar: ");
     String titulo = scanner.nextLine().trim();
     
@@ -284,7 +315,7 @@ public class dotfy {
         
         // O if (!encontrou)
         if (!encontrou){
-            System.out.println("❌ Nenhuma música encontrada com esse nome.");
+            System.out.println("Nenhuma música encontrada com esse nome.");
         }
     }
 
@@ -306,7 +337,7 @@ public static void menuEditarMusica() {
             case 3: editarDuracao(); break;
             case 4: editargenero(); break;
             case 0: break;
-            default: System.out.println("❌ Opção inválida! Tente novamente.");
+            default: System.out.println("Opção inválida! Tente novamente.");
         }
     }
 
@@ -341,7 +372,7 @@ public static void editarTitulo() {
         
         //  caso nao encontre a musica exuibir mensagem
         if (!encontrou){
-            System.out.println("❌ Nenhuma música encontrada com esse nome.");
+            System.out.println(" Nenhuma música encontrada com esse nome.");
         }
     }
 
@@ -375,7 +406,7 @@ public static void editarTitulo() {
         
         //  caso nao encontre a musica exuibir mensagem
         if (!encontrou){
-            System.out.println("❌ Nenhuma Artista encontrado com esse nome.");
+            System.out.println(" Nenhuma Artista encontrado com esse nome.");
         }
     }
 
@@ -396,7 +427,7 @@ public static void editarTitulo() {
             System.out.print("Digite a nova duração (em segundos): ");
             try {
                 int novaDuracao = Integer.parseInt(scanner.nextLine().trim());
-                // A MÁGICA ACONTECE AQUI:
+                // Usamos o método específico da classe audio para atualizar a duração, que já tem validação interna
                 m.atualizarDuracao(novaDuracao);
             } catch (NumberFormatException e) {
                 System.out.println("Erro: Você deve digitar somente números inteiros.");
@@ -408,9 +439,9 @@ public static void editarTitulo() {
     if (!encontrou) {
         System.out.println(" Nenhuma música encontrada com esse nome.");
     }
-        }
         
-        //  caso nao encontre a musica exuibir mensagem
+        
+        //  caso nao encontre a musica exibir mensagem
         if (!encontrou){
             System.out.println("Nenhuma música encontrada com esse nome.");
         }
@@ -447,8 +478,34 @@ public static void editarTitulo() {
         
         //  caso nao encontre a musica exuibir mensagem
         if (!encontrou){
-            System.out.println("❌ Nenhum genero encontrada com esse nome.");
+            System.out.println("Nenhum genero encontrada com esse nome.");
         }
     }
+
+    public static void reproduzirMusica() {
+    System.out.println("\n--- REPRODUZIR ---");
+    System.out.print("Digite o nome da música para tocar: ");
+    String busca = scanner.nextLine().trim().toLowerCase();
+
+    for (Musica m : bancoDeMusicas) {
+        if (m.getTitulo().toLowerCase().contains(busca)) {
+            System.out.println("\n" + "= ".repeat(10));
+            System.out.println("TOCANDO AGORA: " + m.getTitulo());
+            System.out.println("Artista: " + m.getArtista());
+            System.out.println("Duração: " + formatarDuracao(m.getDuracao()));
+            
+            if (usuarioLogado instanceof usuarioPremium) {
+                System.out.println("[Qualidade Alta - Sem Anúncios]");
+            } else {
+                System.out.println("[Qualidade Padrão - Com Anúncios]");
+            }
+            System.out.println("\n" + "= ".repeat(10));
+            return;
+        }adicionarMusicasTeste();
+    }
+    System.out.println(" Música não encontrada.");
+}
+
+
 
 }

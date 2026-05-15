@@ -1,3 +1,4 @@
+package main;
 import java.util.ArrayList;
 
 public class playlist {
@@ -15,6 +16,7 @@ public class playlist {
     public ArrayList<audio> getItens() { return itens; }
 
     public void adicionarItem(audio item) {
+
         this.itens.add(item);
     }
 
