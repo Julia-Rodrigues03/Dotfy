@@ -482,26 +482,47 @@ public static void editarTitulo() {
         }
     }
 
-    public static void reproduzirMusica() {
-    System.out.println("\n--- REPRODUZIR ---");
-    System.out.print("Digite o nome da música para tocar: ");
+public static void reproduzirMusica() {
+    System.out.println("\n--- ÁREA DE REPRODUÇÃO ---");
+    System.out.print("Digite o nome da música: ");
     String busca = scanner.nextLine().trim().toLowerCase();
 
     for (Musica m : bancoDeMusicas) {
         if (m.getTitulo().toLowerCase().contains(busca)) {
-            System.out.println("\n" + "= ".repeat(10));
-            System.out.println("TOCANDO AGORA: " + m.getTitulo());
-            System.out.println("Artista: " + m.getArtista());
-            System.out.println("Duração: " + formatarDuracao(m.getDuracao()));
-            
-            if (usuarioLogado instanceof usuarioPremium) {
-                System.out.println("[Qualidade Alta - Sem Anúncios]");
-            } else {
-                System.out.println("[Qualidade Padrão - Com Anúncios]");
-            }
-            System.out.println("\n" + "= ".repeat(10));
+            int acao;
+            do {
+                System.out.println("\n REPRODUZINDO AGORA: " + m.getTitulo());
+                System.out.println("------------------------------------");
+                System.out.println("1. Pausar | 2. Parar | 3. Baixar | 4. Remover download | 0. Voltar");
+                System.out.print("Escolha uma ação: ");
+                acao = lerOpcao();
+
+                switch (acao) {
+                    case 1:
+                        System.out.println(" Música pausada...");
+                        break;
+                    case 2:
+                        System.out.println("Reprodução parada.");
+                        return; // Sai do modo de reprodução
+                    case 3:
+                        if (usuarioLogado instanceof usuarioPremium) {
+                            System.out.println(" Baixando '" + m.getTitulo() + "' para ouvir offline...");
+                            System.out.println(" Download concluído!");
+                        } else {
+                            System.out.println("Opção exclusiva para usuários Premium!");
+                        }
+                        break;
+                        case 4:
+                            System.out.println("Removendo download de '" + m.getTitulo() + "'...");
+                    case 0:
+                        System.out.println("Saindo do player...");
+                        break;
+                    default:
+                        System.out.println("Opção inválida.");
+                }
+            } while (acao != 0);
             return;
-        }adicionarMusicasTeste();
+        }
     }
     System.out.println(" Música não encontrada.");
 }
